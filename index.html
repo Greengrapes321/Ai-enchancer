@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+google-site-verification: google25b5231611bd1055.html
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grapevine Creation - Image Enhancer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #4CAF50;
+        }
+        header p {
+            margin: 5px 0;
+            font-size: 1.2rem;
+            color: #555;
+        }
+        #uploader {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #uploader:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #canvas {
+            display: none;
+            margin-top: 20px;
+            max-width: 100%;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        #enhancedImage {
+            display: none;
+            margin-top: 20px;
+            max-width: 100%;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+        }
+        #downloadBtn {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #downloadBtn:hover {
+            background-color: #45a049;
+        }
+        #loading {
+            display: none;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Grapevine Creation</h1>
+        <p>Enhance your images with a click!</p>
+        <p>Our professional image enhancer adjusts the colors and brightness to bring out the best in your photos. Upload your image below and experience the transformation.</p>
+    </header>
+    <input type="file" id="uploader" accept="image/*">
+    <div id="loading">Enhancing image, please wait...</div>
+    <canvas id="canvas"></canvas>
+    <img id="enhancedImage" alt="Enhanced Image">
+    <a id="downloadBtn">Download Enhanced Image</a>
+    <footer>
+        &copy; 2024 Grapevine Creation. All rights reserved.
+    </footer>
+    
+    <script>
+        const uploader = document.getElementById('uploader');
+        const canvas = document.getElementById('canvas');
+        const enhancedImage = document.getElementById('enhancedImage');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const loading = document.getElementById('loading');
+        const ctx = canvas.getContext('2d');
+
+        uploader.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        enhanceImage();
+                    }
+                    img.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function enhanceImage() {
+            loading.style.display = 'block';
+            enhancedImage.style.display = 'none';
+            downloadBtn.style.display = 'none';
+
+            setTimeout(() => {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = Math.min(data[i] * 1.2, 255);     // Red
+                    data[i + 1] = Math.min(data[i + 1] * 1.2, 255); // Green
+                    data[i + 2] = Math.min(data[i + 2] * 1.2, 255); // Blue
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+                enhancedImage.src = canvas.toDataURL();
+                enhancedImage.style.display = 'block';
+                downloadBtn.style.display = 'block';
+                downloadBtn.href = canvas.toDataURL('image/png');
+                downloadBtn.download = 'enhanced-image.png';
+                loading.style.display = 'none';
+            }, 2000); // Simulate a 2-second enhancement process
+        }
+    </script>
+</body>
+</html>
